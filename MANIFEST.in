@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include duplicate_finder *.css
+recursive-include duplicate_finder *.csv
+recursive-include duplicate_finder *.html
+recursive-include duplicate_finder *.ico
+recursive-include duplicate_finder *.js
+recursive-include duplicate_finder *.json
+recursive-include duplicate_finder *.md
+recursive-include duplicate_finder *.png
+recursive-include duplicate_finder *.py
+recursive-include duplicate_finder *.svg
+recursive-include duplicate_finder *.txt
+recursive-exclude duplicate_finder *.pyc
