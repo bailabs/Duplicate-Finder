@@ -19,7 +19,7 @@ frappe.ui.form.on('Duplicate Finder', {
                 }
                 var content="";
                 for (var sources = 0; sources < keys.length; sources++) {
-                    content+='<div style="width:896px;  background-color: #fafbfc;padding: 10px 15px;margin: 15px 0px;border: 1px solid #d1d8dd;border-radius: 3px;font-size: 20px;">     <p class="h6">          '+keys[sources]+'                            <a href="#Form/Address/ok-Billing" class="btn btn-default btn-xs pull-right" style="margin-top:-3px; margin-right: -5px;">             Edit</a>     </p>  <table style="width:100%">      '
+                    content+='<div style="width:896px;  background-color: #fafbfc;padding: 10px 15px;margin: 15px 0px;border: 1px solid #d1d8dd;border-radius: 3px;font-size: 20px;">     <p class="h6">          '+keys[sources]+'                            <a href="#" class="btn btn-default btn-xs pull-right" style="margin-top:-3px; margin-right: -5px;">             Merge</a>     </p>  <table style="width:100%">      '
 
 
                     for (var duplicate = 0; duplicate < r.message[keys[sources]].length; duplicate++) {
