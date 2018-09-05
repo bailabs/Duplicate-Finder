@@ -1,7 +1,38 @@
 // Copyright (c) 2018, Bai Web and Mobile Lab and contributors
 // For license information, please see license.txt
 
+var duplicates={};
+
 frappe.ui.form.on('Duplicate Finder', {
+    merge: function (key) {
+        console.log(duplicates[key]);
+        for(var i=0;i<duplicates[key].length;i++){
+            frappe.call({
+                method: "duplicate_finder.duplicate_finder.doctype.duplicate_finder.duplicate_finder.delete_source",
+                args:{
+                 "source": key,
+                    "duplicate": duplicates[key][i]['customer']
+                },
+                callback: function (r) {
+
+                }
+            });
+ frappe.call({
+        method: "frappe.model.rename_doc.rename_doc",
+        args: {
+            doctype: "Customer",
+            old: key,
+            "new": duplicates[key][i]['customer'],
+            "merge": 1
+        },
+         callback: function (r) {
+            frappe.message("Successfully merged.");
+         }
+    });
+        }
+cur_frm.reload_doc();
+    },
+
     refresh: function (frm) {
         var keys = [];
 
@@ -14,13 +45,15 @@ frappe.ui.form.on('Duplicate Finder', {
 
                 }
                 console.log(r.message);
+                duplicates=r.message;
                 for (var key in r.message) {
                     keys.push(key);
 
                 }
                 var content="";
+                                      var merge_method="cur_frm.events.merge('Customer')";
                 for (var sources = 0; sources < keys.length; sources++) {
-                    content+='<div style="width:896px;  background-color: #fafbfc;padding: 10px 15px;margin: 15px 0px;border: 1px solid #d1d8dd;border-radius: 3px;font-size: 20px;">     <p class="h6">          '+keys[sources]+'                            <a href="#" class="btn btn-default btn-xs pull-right" style="margin-top:-3px; margin-right: -5px;">             Merge</a>     </p>  <table style="width:100%">      '
+                    content+='<div style="width:896px;  background-color: #fafbfc;padding: 10px 15px;margin: 15px 0px;border: 1px solid #d1d8dd;border-radius: 3px;font-size: 20px;">     <p class="h6">          '+keys[sources]+'                            <a onclick=\'cur_frm.events.merge("' + keys[sources] + '")\' class="btn btn-default btn-xs pull-right" style="margin-top:-3px; margin-right: -5px;">             Merge</a>     </p>  <table style="width:100%">      '
 
 
                     for (var duplicate = 0; duplicate < r.message[keys[sources]].length; duplicate++) {

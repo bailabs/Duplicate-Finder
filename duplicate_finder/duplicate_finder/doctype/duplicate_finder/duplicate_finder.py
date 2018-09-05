@@ -21,8 +21,17 @@ def get_duplicates():
 				data[source[0]]=[]
 				data2[source[0]]=[]
 			if dup[0] not in data2[source[0]]:
-				data[source[0]].append({'customer':dup[0],'email':dup[1]})
+				if not dup[1]:
+					data[source[0]].append({'customer':dup[0],'email':"No Email Address"})
+				else:
+					data[source[0]].append({'customer': dup[0], 'email': dup[1]})
+
 				data2[source[0]].append(dup[0])
 
 
 	return data
+
+@frappe.whitelist()
+def delete_source(source,duplicate):
+	frappe.db.sql("""Delete from `tabDuplicate Finder List` where source_customer=%s and detected_duplicate_customer=%s""",(source,duplicate))
+	return "success"
