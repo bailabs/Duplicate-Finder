@@ -30,6 +30,7 @@ def duplicate_checker(doc,event):
                         print(field)
                         print(doc.get(field[0]))
                     if field[0] in "customer_name" and val[field[0]]==doc.get(field[0]) and customer[0] not in duplicate_customer:
+                        print("the same name")
                         duplicate_customer.append(customer[0])
 
 
@@ -85,12 +86,12 @@ def duplicate_checker(doc,event):
 
 
 
-    for i in duplicate_contact:
-        if i not in duplicate_customer:
+    for i in duplicate_customer:
+        if i not in duplicate_contact:
             duplicate_customer.append(i)
     print("this customer is duplicated with "+str(duplicate_customer))
     for i in duplicate_customer:
-        if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",(i)))==0:
+        if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(i,doc.name)))==0:
             duplicate=frappe.new_doc("Duplicate Finder List")
             duplicate.source_customer=doc.name
             duplicate.detected_duplicate_customer=i
