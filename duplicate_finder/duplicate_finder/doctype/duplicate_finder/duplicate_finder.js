@@ -6,7 +6,7 @@ var duplicates={};
 frappe.ui.form.on('Duplicate Finder', {
     merge: function (key) {
         console.log(duplicates[key]);
-        frappe.msprint("Please wait, while the duplicate customers are being merged.");
+        frappe.msgprint("Please wait, while the duplicate customers are being merged.");
         for(var i=0;i<duplicates[key].length;i++){
             frappe.call({
                 method: "duplicate_finder.duplicate_finder.doctype.duplicate_finder.duplicate_finder.delete_source",
