@@ -26,7 +26,7 @@ frappe.ui.form.on('Duplicate Finder', {
             "merge": 1
         },
          callback: function (r) {
-            frappe.message("Successfully merged.");
+            frappe.msgprint("Successfully merged.");
          }
     });
         }
