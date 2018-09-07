@@ -67,6 +67,8 @@ cur_frm.reload_doc();
                     $(cur_frm.fields_dict['list'].wrapper).html(content);
 
 
+                }else{
+                    cur_frm.set_df_property("list", "read_only", cur_frm.__islocal ? 0 : 1);
                 }
             }
         });
@@ -112,6 +114,8 @@ cur_frm.reload_doc();
                     $(cur_frm.fields_dict['list'].wrapper).html(content);
 
 
+                }else{
+                    cur_frm.set_df_property("list", "read_only", cur_frm.__islocal ? 0 : 1);
                 }
             }
         });
