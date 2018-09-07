@@ -55,7 +55,7 @@
  "issingle": 1, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2018-09-04 16:00:23.451804", 
+ "modified": "2018-09-07 18:56:41.869216", 
  "modified_by": "Administrator", 
  "module": "Duplicate Finder", 
  "name": "Duplicate Finder", 
@@ -65,7 +65,7 @@
   {
    "amend": 0, 
    "cancel": 0, 
-   "create": 1, 
+   "create": 0, 
    "delete": 1, 
    "email": 1, 
    "export": 0, 
