@@ -24,12 +24,12 @@ def duplicate_checker(doc,event):
 
 
                 for val in value:
-                    if val[field[0]]==doc.get(field[0]) and doc.get(field[0])!=None:
+                    if str(val[field[0]]).lower()==str(doc.get(field[0])).lower() and doc.get(field[0])!=None:
                         number_of_equal_values+=1
                         print(value)
                         print(field)
                         print(doc.get(field[0]))
-                    if field[0] in "customer_name" and val[field[0]]==doc.get(field[0]) and customer[0] not in duplicate_customer:
+                    if field[0] in "customer_name" and str(val[field[0]]).lower()==str(doc.get(field[0])).lower() and customer[0] not in duplicate_customer:
                         print("the same name")
                         duplicate_customer.append(customer[0])
 
@@ -69,7 +69,7 @@ def duplicate_checker(doc,event):
                 for val in value:
                     for val2 in sc_value:
                         if field[0] not in "docstatus" and field[0] not in "doctype" and field[0] not in "is_primary_contact" and field[0] not in "owner" and field[0] not in "status":
-                            if val[field[0]]==val2[field[0]] and val2[field[0]]!=None:
+                            if str(val[field[0]]).lower()==str(val2[field[0]]).lower() and val2[field[0]]!=None:
                                 number_of_equal_values_contacts+=1
                                 print(value)
                                 print(field)
@@ -106,7 +106,7 @@ def duplicate_checker(doc,event):
                     duplicate.email_address="No Email Address"
 
             duplicate.save()
-        elif  len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(i)))!=0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(i,doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(doc.name,i)))==0:
+        elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(i)))!=0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(i,doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(doc.name,i)))==0:
             duplicate = frappe.new_doc("Duplicate Finder List")
             duplicate.source_customer = i
             duplicate.detected_duplicate_customer = doc.name
@@ -152,12 +152,12 @@ def detect_duplicates_through_contact(doc,event):
                 value = frappe.get_all('Customer', filters={'name': customer[0]}, fields=[field[0]])
 
                 for val in value:
-                    if val[field[0]] == doc.get(field[0]) and doc.get(field[0]) != None:
+                    if str(val[field[0]]).lower() == str(doc.get(field[0])).lower() and doc.get(field[0]) != None:
                         number_of_equal_values += 1
                         print(value)
                         print(field)
                         print(doc.get(field[0]))
-                    if field[0] in "customer_name" and val[field[0]] == doc.get(field[0]) and customer[
+                    if field[0] in "customer_name" and str(val[field[0]]).lower() == str(doc.get(field[0])).lower() and customer[
                         0] not in duplicate_customer:
                         duplicate_customer.append(customer[0])
 
@@ -199,7 +199,7 @@ def detect_duplicates_through_contact(doc,event):
                     for val2 in sc_value:
                         if field[0] not in "docstatus" and field[0] not in "doctype" and field[
                             0] not in "is_primary_contact" and field[0] not in "owner" and field[0] not in "status":
-                            if val[field[0]] == val2[field[0]] and val2[field[0]] != None:
+                            if str(val[field[0]]).lower() == str(val2[field[0]]).lower() and val2[field[0]] != None:
                                 number_of_equal_values_contacts += 1
                                 print(value)
                                 print(field)
@@ -249,3 +249,15 @@ def detect_duplicates_through_contact(doc,event):
                     duplicate.email_address = "No Email Address"
 
             duplicate.save()
+
+
+# @frappe.whitelist()
+# def delete_customer(doc,event):
+#     if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(doc.name)))!=0:
+#         duplicates_for_this_source=frappe.db.sql("""Select detected_duplicate_customer from `tabDuplicate Finder List` where source_customer=%s""",(doc.name))
+#         new_source=""
+#         for i in duplicates_for_this_source:
+#             new_source=i[0]
+#         frappe.db.sql("""Update from `tabDuplicate Finder List` set source_customer=%s where source_customer=%s""",(new_source,doc.name))
+#     else:
+#         frappe.db.sql("""Delete""")
