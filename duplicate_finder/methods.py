@@ -251,13 +251,13 @@ def detect_duplicates_through_contact(doc,event):
             duplicate.save()
 
 
-# @frappe.whitelist()
-# def delete_customer(doc,event):
-#     if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(doc.name)))!=0:
-#         duplicates_for_this_source=frappe.db.sql("""Select detected_duplicate_customer from `tabDuplicate Finder List` where source_customer=%s""",(doc.name))
-#         new_source=""
-#         for i in duplicates_for_this_source:
-#             new_source=i[0]
-#         frappe.db.sql("""Update from `tabDuplicate Finder List` set source_customer=%s where source_customer=%s""",(new_source,doc.name))
-#     else:
-#         frappe.db.sql("""Delete""")
+@frappe.whitelist()
+def delete_customer(doc,event):
+    if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(doc.name)))!=0:
+        duplicates_for_this_source=frappe.db.sql("""Select detected_duplicate_customer from `tabDuplicate Finder List` where source_customer=%s""",(doc.name))
+        new_source=""
+        for i in duplicates_for_this_source:
+            new_source=i[0]
+        frappe.db.sql("""Update from `tabDuplicate Finder List` set source_customer=%s where source_customer=%s""",(new_source,doc.name))
+    else:
+        frappe.db.sql("""Delete from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",(doc.name))
