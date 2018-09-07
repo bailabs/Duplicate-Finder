@@ -201,9 +201,10 @@ def detect_duplicates_through_contact(doc,event):
             for sc in source_contact:
                 print("customer " + sc[0] + " is duplicate to customer " + customer_contact[1])
 
-    for i in duplicate_contact:
-        if i not in duplicate_customer:
-            duplicate_customer.append(i)
+    for i in range(len(duplicate_customer)):
+        print(i)
+        if duplicate_customer[i] not in duplicate_contact:
+            duplicate_customer.append(duplicate_customer[i])
     print("this customer is duplicated with " + str(duplicate_customer))
     for i in duplicate_customer:
         if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
