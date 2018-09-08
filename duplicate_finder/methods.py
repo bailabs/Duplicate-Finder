@@ -266,9 +266,10 @@ def delete_customer(doc,event):
 from frappe.model.rename_doc import rename_doc
 @frappe.whitelist()
 def test(key,duplicates):
-    print(json.loads(duplicates))
+    print("sorted")
+    print(sorted(json.loads(duplicates)[key],reverse=True))
     old_key=key
-    for dup in json.loads(duplicates)[key]:
+    for dup in sorted(json.loads(duplicates)[key],reverse=True):
         print(dup['customer'])
         print("old")
         print(old_key)
