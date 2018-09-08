@@ -86,47 +86,112 @@ def duplicate_checker(doc,event):
 
 
     print (duplicate_customer)
-    for i in range(len(duplicate_customer)):
-        print(i)
-        if duplicate_customer[i] not in duplicate_contact:
-            duplicate_customer.append(duplicate_customer[i])
-    print("this customer is duplicated with "+str(duplicate_customer))
-    for i in duplicate_customer:
-        if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(i,doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(doc.name,i)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",(i)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",(doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(i)))==0:
-            duplicate = frappe.get_doc({'doctype':"Duplicate Finder List"})
-            duplicate.source_customer=doc.name
-            duplicate.detected_duplicate_customer=i
-            link=frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""",(i))
-            for l in link:
-                email_id=frappe.db.sql("""Select email_id from `tabContact` where name=%s""",(l[0]))
-                for e in email_id:
-                    if e[0] and e[0]!=None:
-                        duplicate.email_address=e[0]
-                if not duplicate.email_address or duplicate.email_address==None:
-                    duplicate.email_address="No Email Address"
+    if duplicate_contact:
+        for i in range(len(duplicate_contact)):
+            print(i)
+            if duplicate_contact[i] not in duplicate_customer:
+                duplicate_contact.append(duplicate_contact[i])
+        for i in duplicate_contact:
+            if len(frappe.db.sql(
+                    """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                    (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (doc.name))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""", (i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = doc.name
+                duplicate.detected_duplicate_customer = i
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (i))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
 
-            duplicate.insert(ignore_permissions=True)
-        elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(i)))!=0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(i,doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(doc.name,i)))==0:
-            duplicate = frappe.get_doc({'doctype':"Duplicate Finder List"})
-            duplicate.source_customer = i
-            duplicate.detected_duplicate_customer = doc.name
-            link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
-            for l in link:
-                email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
-                for e in email_id:
-                    if e[0] and e[0] != None:
-                        duplicate.email_address = e[0]
-                if not duplicate.email_address or duplicate.email_address == None:
-                    duplicate.email_address = "No Email Address"
+                duplicate.insert(ignore_permissions=True)
+            elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",
+                                   (i))) != 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = i
+                duplicate.detected_duplicate_customer = doc.name
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
 
-            duplicate.insert(ignore_permissions=True)
+                duplicate.insert(ignore_permissions=True)
+    elif duplicate_customer:
+        for i in range(len(duplicate_customer)):
+            print(i)
+            if duplicate_customer[i] not in duplicate_contact:
+                duplicate_customer.append(duplicate_customer[i])
+        for i in duplicate_customer:
+            if len(frappe.db.sql(
+                    """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                    (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (doc.name))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""", (i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = doc.name
+                duplicate.detected_duplicate_customer = i
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (i))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
+
+                duplicate.insert(ignore_permissions=True)
+            elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",
+                                   (i))) != 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = i
+                duplicate.detected_duplicate_customer = doc.name
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
+
+                duplicate.insert(ignore_permissions=True)
+    print("this customer is duplicated with " + str(duplicate_contact))
+    print("this customer is duplicated with " + str(duplicate_customer))
 
 @frappe.whitelist()
 def detect_duplicates_through_contact(doc,event):
     link_name=frappe.db.sql("""Select link_name from `tabDynamic Link` where parent=%s""",(doc.name))
-    for ln in link_name:
-
-        doc=frappe.get_doc("Customer",{'name':ln[0]})
+    print(doc.name)
+    for i in link_name:
+        doc=frappe.get_doc("Customer",{'name':i[0]})
+    print(doc.name)
     customer_fields = frappe.db.sql(
         """Select fieldname from `tabDocField` where parent='Customer' and fieldtype!='Section Break' and fieldtype!='HTML' and fieldtype!='Attach Image' and fieldtype!='Column Break' and fieldtype!='Table'""")
     existing_customers = frappe.db.sql("""Select name from tabCustomer where name!=%s""", (doc.name))
@@ -157,8 +222,9 @@ def detect_duplicates_through_contact(doc,event):
                         print(value)
                         print(field)
                         print(doc.get(field[0]))
-                    if field[0] in "customer_name" and str(val[field[0]]).lower() == str(doc.get(field[0])).lower() and customer[
-                        0] not in duplicate_customer:
+                    if field[0] in "customer_name" and str(val[field[0]]).lower() == str(doc.get(field[0])).lower() and \
+                                    customer[0] not in duplicate_customer:
+                        print("the same name")
                         duplicate_customer.append(customer[0])
 
         print("number of equal values " + str(number_of_equal_values))
@@ -204,8 +270,8 @@ def detect_duplicates_through_contact(doc,event):
                                 print(value)
                                 print(field)
                                 print(val2[field[0]])
-                            if field[0] in "email_id" and val[field[0]] == val2[field[0]] and val2[field[0]] != None and \
-                                            customer_contact[1] not in duplicate_contact:
+                            if field[0] in "email_id" and val[field[0]] == val2[field[0]] and val2[field[0]] != None and customer_contact[1] not in duplicate_contact:
+                                print("the same email")
                                 duplicate_contact.append(customer_contact[1])
 
         print("number of equal values of contacts " + str(number_of_equal_values_contacts))
@@ -215,41 +281,105 @@ def detect_duplicates_through_contact(doc,event):
             for sc in source_contact:
                 print("customer " + sc[0] + " is duplicate to customer " + customer_contact[1])
 
-    for i in range(len(duplicate_customer)):
-        print(i)
-        if duplicate_customer[i] not in duplicate_contact:
-            duplicate_customer.append(duplicate_customer[i])
+    print (duplicate_customer)
+    if duplicate_contact:
+        for i in range(len(duplicate_contact)):
+            print(i)
+            if duplicate_contact[i] not in duplicate_customer:
+                duplicate_contact.append(duplicate_contact[i])
+        for i in duplicate_contact:
+            if len(frappe.db.sql(
+                    """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                    (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (doc.name))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""", (i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = doc.name
+                duplicate.detected_duplicate_customer = i
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (i))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
+
+                duplicate.insert(ignore_permissions=True)
+            elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",
+                                   (i))) != 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = i
+                duplicate.detected_duplicate_customer = doc.name
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
+
+                duplicate.insert(ignore_permissions=True)
+    elif duplicate_customer:
+        for i in range(len(duplicate_customer)):
+            print(i)
+            if duplicate_customer[i] not in duplicate_contact:
+                duplicate_customer.append(duplicate_customer[i])
+        for i in duplicate_customer:
+            if len(frappe.db.sql(
+                    """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                    (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (i))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                              (doc.name))) == 0 and len(
+                frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""", (i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = doc.name
+                duplicate.detected_duplicate_customer = i
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (i))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
+
+                duplicate.insert(ignore_permissions=True)
+            elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",
+                                   (i))) != 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (i, doc.name))) == 0 and len(frappe.db.sql(
+                """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",
+                (doc.name, i))) == 0:
+                duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+                duplicate.source_customer = i
+                duplicate.detected_duplicate_customer = doc.name
+                link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
+                for l in link:
+                    email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+                    for e in email_id:
+                        if e[0] and e[0] != None:
+                            duplicate.email_address = e[0]
+                    if not duplicate.email_address or duplicate.email_address == None:
+                        duplicate.email_address = "No Email Address"
+
+                duplicate.insert(ignore_permissions=True)
+    print("this customer is duplicated with " + str(duplicate_contact))
     print("this customer is duplicated with " + str(duplicate_customer))
-    for i in duplicate_customer:
-        if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(i,doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(doc.name,i)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",(i)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",(doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(i)))==0:
-            duplicate=frappe.get_doc({'doctype':"Duplicate Finder List"})
-            duplicate.source_customer=doc.name
-            duplicate.detected_duplicate_customer=i
-            link=frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""",(i))
-            for l in link:
-                email_id=frappe.db.sql("""Select email_id from `tabContact` where name=%s""",(l[0]))
-                for e in email_id:
-                    if e[0] and e[0]!=None:
-                        duplicate.email_address=e[0]
-                if not duplicate.email_address or duplicate.email_address==None:
-                    duplicate.email_address="No Email Address"
-
-            duplicate.insert(ignore_permissions=True)
-        elif  len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",(i)))!=0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(i,doc.name)))==0 and len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s and source_customer=%s""",(doc.name,i)))==0:
-            duplicate = frappe.get_doc({'doctype':"Duplicate Finder List"})
-            duplicate.source_customer = i
-            duplicate.detected_duplicate_customer = doc.name
-            link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
-            for l in link:
-                email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
-                for e in email_id:
-                    if e[0] and e[0] != None:
-                        duplicate.email_address = e[0]
-                if not duplicate.email_address or duplicate.email_address == None:
-                    duplicate.email_address = "No Email Address"
-
-            duplicate.insert(ignore_permissions=True)
-
 
 @frappe.whitelist()
 def delete_customer(doc,event):
