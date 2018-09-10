@@ -19,7 +19,7 @@ def duplicate_checker(doc,event):
 
 
         for field in customer_fields:
-            if field[0] not in "bypass_credit_limit_check_at_sales_order" and field[0] not in "customer_group" and field[0] not in "customer_type" and field[0] not in "disabled" and field[0] not in "docstatus" and field[0] not in "doctype" and field[0] not in "is_internal_customer" and field[0] not in "language" and field[0] not in "naming_series" and field[0] not in "owner" and field[0] not in "territory":
+            if field[0] not in "is_frozen" and field[0] not in "disabled" and field[0] not in "is_internal_customer" and field[0] not in "credit_limit" and field[0] not in "bypass_credit_limit_check_at_sales_order" and field[0] not in "loyalty_program" and field[0] not in "default_commission_rate" and field[0] not in "bypass_credit_limit_check_at_sales_order" and field[0] not in "customer_group" and field[0] not in "customer_type" and field[0] not in "disabled" and field[0] not in "docstatus" and field[0] not in "doctype" and field[0] not in "is_internal_customer" and field[0] not in "language" and field[0] not in "naming_series" and field[0] not in "owner" and field[0] not in "territory":
                 value=frappe.get_all('Customer', filters={'name': customer[0]}, fields=[field[0]])
 
 
@@ -58,6 +58,7 @@ def duplicate_checker(doc,event):
     print(no_of_values_source_contact)
     print(fifty_percent_contact)
     duplicate_contact=[]
+    contacts_of_existing_customers
     for customer_contact in contacts_of_existing_customers:
         number_of_equal_values_contacts = 0
 
@@ -68,7 +69,7 @@ def duplicate_checker(doc,event):
 
                 for val in value:
                     for val2 in sc_value:
-                        if field[0] not in "docstatus" and field[0] not in "doctype" and field[0] not in "is_primary_contact" and field[0] not in "owner" and field[0] not in "status":
+                        if field[0] not in "unsubscribed" and field[0] not in "docstatus" and field[0] not in "doctype" and field[0] not in "is_primary_contact" and field[0] not in "owner" and field[0] not in "status":
                             if str(val[field[0]]).lower()==str(val2[field[0]]).lower() and val2[field[0]]!=None:
                                 number_of_equal_values_contacts+=1
                                 print(value)
@@ -209,11 +210,14 @@ def detect_duplicates_through_contact(doc,event):
         number_of_equal_values = 0
 
         for field in customer_fields:
-            if field[0] not in "bypass_credit_limit_check_at_sales_order" and field[0] not in "customer_group" and \
-                            field[0] not in "customer_type" and field[0] not in "disabled" and field[
-                0] not in "docstatus" and field[0] not in "doctype" and field[0] not in "is_internal_customer" and \
-                            field[0] not in "language" and field[0] not in "naming_series" and field[
-                0] not in "owner" and field[0] not in "territory":
+            if field[0] not in "is_frozen" and field[0] not in "disabled" and field[0] not in "is_internal_customer" and \
+                            field[0] not in "credit_limit" and field[
+                0] not in "bypass_credit_limit_check_at_sales_order" and field[0] not in "loyalty_program" and field[
+                0] not in "default_commission_rate" and field[0] not in "bypass_credit_limit_check_at_sales_order" and \
+                            field[0] not in "customer_group" and field[0] not in "customer_type" and field[
+                0] not in "disabled" and field[0] not in "docstatus" and field[0] not in "doctype" and field[
+                0] not in "is_internal_customer" and field[0] not in "language" and field[0] not in "naming_series" and \
+                            field[0] not in "owner" and field[0] not in "territory":
                 value = frappe.get_all('Customer', filters={'name': customer[0]}, fields=[field[0]])
 
                 for val in value:
@@ -263,15 +267,16 @@ def detect_duplicates_through_contact(doc,event):
 
                 for val in value:
                     for val2 in sc_value:
-                        if field[0] not in "docstatus" and field[0] not in "doctype" and field[
-                            0] not in "is_primary_contact" and field[0] not in "owner" and field[0] not in "status":
+                        if field[0] not in "unsubscribed" and field[0] not in "docstatus" and field[
+                            0] not in "doctype" and field[0] not in "is_primary_contact" and field[0] not in "owner" and \
+                                        field[0] not in "status":
                             if str(val[field[0]]).lower() == str(val2[field[0]]).lower() and val2[field[0]] != None:
                                 number_of_equal_values_contacts += 1
                                 print(value)
                                 print(field)
                                 print(val2[field[0]])
-                            if field[0] in "email_id" and val[field[0]] == val2[field[0]] and val2[field[0]] != None and customer_contact[1] not in duplicate_contact:
-                                print("the same email")
+                            if field[0] in "email_id" and val[field[0]] == val2[field[0]] and val2[field[0]] != None and \
+                                            customer_contact[1] not in duplicate_contact:
                                 duplicate_contact.append(customer_contact[1])
 
         print("number of equal values of contacts " + str(number_of_equal_values_contacts))
