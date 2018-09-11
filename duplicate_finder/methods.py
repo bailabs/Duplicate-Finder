@@ -84,7 +84,7 @@ def duplicate_checker(doc,event):
                                 duplicate_contact.append(customer_contact[1])
 
         print("number of equal values of contacts " + str(number_of_equal_values_contacts))
-        if number_of_equal_values_contacts >= fifty_percent_contact and customer_contact[1] not in duplicate_contact:
+        if number_of_equal_values_contacts >= fifty_percent_contact and fifty_percent_contact!=0 and customer_contact[1] not in duplicate_contact:
             duplicate_contact.append(customer_contact[1])
 
             for sc in source_contact:
@@ -242,7 +242,7 @@ def detect_duplicates_through_contact(doc,event):
                                 duplicate_contact.append(customer_contact[1])
 
         print("number of equal values of contacts " + str(number_of_equal_values_contacts))
-        if number_of_equal_values_contacts >= fifty_percent_contact and customer_contact[1] not in duplicate_contact:
+        if number_of_equal_values_contacts >= fifty_percent_contact and fifty_percent_contact!=0 and customer_contact[1] not in duplicate_contact:
             duplicate_contact.append(customer_contact[1])
 
             for sc in source_contact:
