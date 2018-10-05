@@ -21,22 +21,20 @@ frappe.ui.form.on('Duplicate Finder', {
             });
 
         }
-        console.log("call duplicates");
-console.log(duplicates);
-            frappe.call({
-                method: "duplicate_finder.methods.test",
-                args: {
-                    "key": key,
-                    "duplicates": duplicates
-                },
-                callback: function (r) {
+        frappe.call({
+            method: "duplicate_finder.methods.merge",
+            args: {
+                "key": key,
+                "duplicates": duplicates
+            },
+            callback: function (r) {
 
-                    frappe.msgprint("Successfully merged.");
-                }
-            });
+                frappe.msgprint("Successfully merged.");
+                cur_frm.reload_doc();
+            }
+        });
 
 
-        cur_frm.reload_doc();
     },
 
     refresh: function (frm) {
@@ -52,8 +50,6 @@ console.log(duplicates);
                         cur_frm.set_df_property("list", "read_only", cur_frm.__islocal ? 0 : 1);
 
                     }
-                    console.log("received duplicates");
-                    console.log(r.message);
                     duplicates = r.message;
                     for (var key in r.message) {
                         keys.push(key);
@@ -66,7 +62,6 @@ console.log(duplicates);
 
 
                         for (var duplicate = 0; duplicate < r.message[keys[sources]].length; duplicate++) {
-                            console.log(r.message[keys[sources]][duplicate]);
                             content += ' <tr><th>' + r.message[keys[sources]][duplicate]['customer'] + '</th><th>' + r.message[keys[sources]][duplicate]["email"] + '</th></tr>';
                         }
                         content += '</table></div>';
@@ -98,7 +93,6 @@ console.log(duplicates);
             callback: function (r) {
                 if (r.message) {
 
-                    console.log(r.message);
                     if (r.message.length == 0) {
                         cur_frm.set_df_property("list", "read_only", cur_frm.__islocal ? 0 : 1);
 
@@ -113,7 +107,6 @@ console.log(duplicates);
 
 
                         for (var duplicate = 0; duplicate < r.message[keys[sources]].length; duplicate++) {
-                            console.log(r.message[keys[sources]][duplicate]);
                             content += ' <tr><th>' + r.message[keys[sources]][duplicate]['customer'] + '</th><th>' + r.message[keys[sources]][duplicate]["email"] + '</th></tr>';
                         }
                         content += '</table></div>';

@@ -81,11 +81,11 @@ app_license = "MIT"
 
 doc_events = {
 	"Customer": {
-		"on_update": "duplicate_finder.methods.duplicate_checker",
+		"after_insert": "duplicate_finder.methods.duplicate_checker",
 	},
 
 	"Contact": {
-		"on_update": "duplicate_finder.methods.detect_duplicates_through_contact"
+		"after_insert": "duplicate_finder.methods.detect_duplicates_through_contact"
 	}
 }
 
