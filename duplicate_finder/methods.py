@@ -14,6 +14,7 @@ import frappe
 
 from frappe.model.rename_doc import rename_doc
 
+from difflib import SequenceMatcher
 
 @frappe.whitelist()
 def duplicate_checker(doc, event):
@@ -26,69 +27,74 @@ def duplicate_checker(doc, event):
     duplicate_customer = list(set(duplicate_customer))
 
     for i in duplicate_customer:
-        if len(frappe.db.sql(
-                """Select name from `tabDuplicate Finder List` where  source_customer=%s""",
-                (i))) == 0 and len(frappe.db.sql(
-            """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s """,
-            (i))) == 0:
-            duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+        duplicate=[]
 
-            duplicate.source_customer = doc.name
+        duplicate=new_detect_or_not(doc,duplicate,i)
 
-            duplicate.detected_duplicate_customer = i
+        duplicate.insert(ignore_permissions=True)
 
-            link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (i))
+def new_detect_or_not(doc,duplicate,i):
+    if len(frappe.db.sql(
+            """Select name from `tabDuplicate Finder List` where  source_customer=%s""",
+            (i))) == 0 and len(frappe.db.sql(
+        """Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s """,
+        (i))) == 0:
+        duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
 
-            for l in link:
-                email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+        duplicate.source_customer = doc.name
 
-                for e in email_id:
-                    if e[0] and e[0] != None:
-                        duplicate.email_address = e[0]
+        duplicate.detected_duplicate_customer = i
 
-                if not duplicate.email_address or duplicate.email_address == None:
-                    duplicate.email_address = "No Email Address"
+        link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (i))
 
-            duplicate.insert(ignore_permissions=True)
+        for l in link:
+            email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
 
-        elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",
-                               (i))) != 0 or len(
-            frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
-                          (i))) != 0:
+            for e in email_id:
+                if e[0] and e[0] != None:
+                    duplicate.email_address = e[0]
 
-            duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
-
-            if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
-                                 (i))):
-                duplicate.source_customer = frappe.db.sql(
-                    """Select source_customer from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
-                    (i))[0][0]
-
-            else:
-                duplicate.source_customer = i
-
-            duplicate.detected_duplicate_customer = doc.name
-
-            link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
-
-            for l in link:
-                email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
-
-                for e in email_id:
-                    if e[0] and e[0] != None:
-                        duplicate.email_address = e[0]
-
-                if not duplicate.email_address or duplicate.email_address == None:
-                    duplicate.email_address = "No Email Address"
-
-            duplicate.insert(ignore_permissions=True)
+            if not duplicate.email_address or duplicate.email_address == None:
+                duplicate.email_address = "No Email Address"
 
 
+    elif len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where source_customer=%s""",
+                           (i))) != 0 or len(
+        frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                      (i))) != 0:
+
+        duplicate = frappe.get_doc({'doctype': "Duplicate Finder List"})
+
+        if len(frappe.db.sql("""Select name from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                             (i))):
+            duplicate.source_customer = frappe.db.sql(
+                """Select source_customer from `tabDuplicate Finder List` where detected_duplicate_customer=%s""",
+                (i))[0][0]
+
+        else:
+            duplicate.source_customer = i
+
+        duplicate.detected_duplicate_customer = doc.name
+
+        link = frappe.db.sql("""Select parent from `tabDynamic Link` where link_name=%s""", (doc.name))
+
+        for l in link:
+            email_id = frappe.db.sql("""Select email_id from `tabContact` where name=%s""", (l[0]))
+
+            for e in email_id:
+                if e[0] and e[0] != None:
+                    duplicate.email_address = e[0]
+
+            if not duplicate.email_address or duplicate.email_address == None:
+                duplicate.email_address = "No Email Address"
+
+    return duplicate
 @frappe.whitelist()
 def detect_duplicate_customer(doc):
     customer_fields = frappe.db.sql(
         """Select fieldname from `tabDocField` where parent='Customer' and fieldtype!='Section Break' and fieldtype!='HTML' and fieldtype!='Attach Image' and fieldtype!='Column Break' and fieldtype!='Table'""")
     existing_customers = frappe.db.sql("""Select name from tabCustomer where name!=%s""", (doc.name))
+
     no_of_values_source_doc = 0
 
     for field in customer_fields:
@@ -99,29 +105,44 @@ def detect_duplicate_customer(doc):
 
     duplicate_customer = []
 
+    not_allowed_fields=[
+        "is_frozen",
+        "disabled",
+        "is_internal_customer",
+        "credit_limit",
+        "bypass_credit_limit_check_at_sales_order",
+        "loyalty_program",
+        "default_commission_rate",
+        "bypass_credit_limit_check_at_sales_order",
+        "customer_group",
+        "customer_type",
+        "disabled",
+        "docstatus",
+        "doctype",
+        "is_internal_customer",
+        "language",
+        "naming_series",
+        "owner",
+        "territory"
+        ]
+
     for customer in existing_customers:
         number_of_equal_values = 0
 
         for field in customer_fields:
-            if field[0] not in "is_frozen" and field[0] not in "disabled" and field[0] not in "is_internal_customer" and \
-                            field[0] not in "credit_limit" and field[
-                0] not in "bypass_credit_limit_check_at_sales_order" and field[0] not in "loyalty_program" and field[
-                0] not in "default_commission_rate" and field[0] not in "bypass_credit_limit_check_at_sales_order" and \
-                            field[0] not in "customer_group" and field[0] not in "customer_type" and field[
-                0] not in "disabled" and field[0] not in "docstatus" and field[0] not in "doctype" and field[
-                0] not in "is_internal_customer" and field[0] not in "language" and field[0] not in "naming_series" and \
-                            field[0] not in "owner" and field[0] not in "territory":
+            if field[0] not in not_allowed_fields:
                 value = frappe.get_all('Customer', filters={'name': customer[0]}, fields=[field[0]])
 
-                if str(value[0][field[0]]).lower() == str(doc.get(field[0])).lower() and doc.get(field[0]) != None:
+                if similar(str(value[0][field[0]]).lower(),str(doc.get(field[0])).lower()) >= 0.8 and doc.get(field[0]) != None:
                     number_of_equal_values += 1
 
-                if field[0] in "customer_name" and str(value[0][field[0]]).lower() == str(doc.get(field[0])).lower() and \
+                if field[0] in "customer_name" and similar(str(value[0][field[0]]).lower(),str(doc.get(field[0])).lower()) >= 0.8 and \
                                 customer[0] not in duplicate_customer:
                     duplicate_customer.append(customer[0])
 
         if number_of_equal_values >= fifty_percent and customer[0] not in duplicate_customer:
             duplicate_customer.append(customer[0])
+
     return duplicate_customer
 
 
@@ -158,22 +179,27 @@ def detect_duplicate_contact(doc):
             for sc in source_contact:
                 sc_value = frappe.get_all('Contact', filters={'name': sc[0]}, fields=[field[0]])
 
-                if field[0] not in "unsubscribed" and field[0] not in "docstatus" and field[
-                    0] not in "doctype" and field[0] not in "is_primary_contact" and field[0] not in "owner" and \
-                                field[0] not in "status":
-                    print(value)
-                    print(sc_value)
+                not_allowed_fields=[
+                    "unsubscribed",
+                    "docstatus",
+                    "doctype",
+                    "is_primary_contact",
+                    "owner",
+                    "status"
+                ]
+
+                if field[0] not in not_allowed_fields:
                     try:
-                        if str(value[0][field[0]]).lower() in str(sc_value[0][field[0]]).lower() and sc_value[0][
+                        if similar(str(value[0][field[0]]).lower(),str(sc_value[0][field[0]]).lower()) >= 0.8 and sc_value[0][
                             field[0]] != None:
                             number_of_equal_values_contacts += 1
 
-                        if field[0] in "email_id" and value[0][field[0]] == sc_value[0][field[0]] and sc_value[0][
-                            field[0]] != None and \
-                                        customer_contact[1] not in duplicate_contact:
+                        if field[0] in "email_id" and similar(value[0][field[0]],sc_value[0][field[0]]) >= 0.8  and sc_value[0][
+                            field[0]] != None and customer_contact[1] not in duplicate_contact:
                             duplicate_contact.append(customer_contact[1])
                     except:
                         pass
+
 
         if number_of_equal_values_contacts >= fifty_percent_contact and fifty_percent_contact != 0 and customer_contact[
             1] not in duplicate_contact:
@@ -221,3 +247,6 @@ def merge(key, duplicates):
         rename_doc("Customer", old_key, dup['customer'], merge=True)
 
         old_key = dup['customer']
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
